@@ -17,10 +17,10 @@ import org.springframework.shell.standard.ShellOption;
 import org.springframework.shell.*;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -52,14 +52,45 @@ public class Download {
 
     public List<String> desg(String url)  {
         this.url = url;
+        String saveDirectory = System.getProperty("user.home") + "/Downloads/visuales/";
         try {
             this.connect();
 
             LinkExtractor linkExtractor = new LinkExtractor();
-
+            List<String> links =  linkExtractor.getAllLinks(url);
+            if (!links.isEmpty()) {
+                for (String link : links) {
+                    String fileName = URLDecoder.decode(link.substring(link.lastIndexOf("/") + 1), StandardCharsets.UTF_8.name());
+                    System.out.println(fileName);
+                    this.downloadFile(link, saveDirectory+fileName);
+                }
+            } else {
+                System.out.println("No video or subtitle links found.");
+            }
             return linkExtractor.getAllLinks(url);
         } catch (IOException e) {
             throw new RuntimeException(" No se puede acceder al sitio "+ url+ "\n compruebe su conexion",e);
+        }
+    }
+
+    public void downloadFile(String fileUrl, String saveDir) {
+
+        File dir = new File(saveDir).getParentFile();
+        if (!dir.exists()) {
+            dir.mkdirs();  //
+            System.out.println("Directory created: " + dir.getAbsolutePath());
+        }
+        try (InputStream inputStream = new URL(fileUrl).openStream();
+             FileOutputStream outputStream = new FileOutputStream(saveDir)) {
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            System.out.println("Descargando: " + fileUrl);
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+            System.out.println("Download completed: " + saveDir);
+        } catch (IOException e) {
+            System.err.println("Error downloading the file: " + e.getMessage());
         }
     }
 
