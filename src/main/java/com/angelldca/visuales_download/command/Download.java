@@ -2,6 +2,7 @@ package com.angelldca.visuales_download.command;
 
 import com.angelldca.visuales_download.Exceptions.ExceptionConnect;
 import com.angelldca.visuales_download.Scrap.LinkExtractor;
+import com.angelldca.visuales_download.Terminal.AnsiColors;
 import org.jline.terminal.Terminal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.shell.Availability;
@@ -25,13 +26,15 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static ch.qos.logback.core.pattern.color.ANSIConstants.GREEN_FG;
+import static ch.qos.logback.core.pattern.color.ANSIConstants.RESET;
+
 @Component
 public class Download {
     private boolean connected = false;
     private String url = "https://visuales.uclv.cu"; //http://localhost:4200 https://www.google.com
 
     public void connect() throws IOException  {
-
 
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("HEAD");
@@ -61,11 +64,11 @@ public class Download {
             if (!links.isEmpty()) {
                 for (String link : links) {
                     String fileName = URLDecoder.decode(link.substring(link.lastIndexOf("/") + 1), StandardCharsets.UTF_8.name());
-                    System.out.println(fileName);
                     this.downloadFile(link, saveDirectory+fileName);
                 }
             } else {
-                System.out.println("No video or subtitle links found.");
+                System.out.println(AnsiColors.RED+"No video or subtitle links found.");
+                System.out.println(AnsiColors.RESET);
             }
             return linkExtractor.getAllLinks(url);
         } catch (IOException e) {
@@ -88,9 +91,11 @@ public class Download {
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
             }
-            System.out.println("Download completed: " + saveDir);
+            System.out.println(AnsiColors.GREEN +"Download completed: " + saveDir);
+            System.out.println(AnsiColors.RESET);
         } catch (IOException e) {
-            System.err.println("Error downloading the file: " + e.getMessage());
+            System.err.println(AnsiColors.RED +"Error downloading the file: " + e.getMessage());
+            System.out.println(AnsiColors.RESET);
         }
     }
 

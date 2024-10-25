@@ -31,7 +31,8 @@ public class Comand {
                     for (String link : links) {
                         System.out.println(link);
                     }
-                    return "Hello ";
+
+                    return "\u001B[32m" + " Descarga completada";
                 })
                 .and()
                 .build();

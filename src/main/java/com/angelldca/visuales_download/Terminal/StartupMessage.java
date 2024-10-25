@@ -21,9 +21,12 @@ public class StartupMessage {
     @PostConstruct
     public void displayWelcomeMessage() {
         PrintWriter writer = terminal.writer();
-        writer.println("Ingrese el comando 'download --arg' seguido de la url de la carpeta que deseas descargar");
+        writer.println(AnsiColors.YELLOW+ "Ingrese el comando 'download' seguido de la url de la carpeta que deseas descargar");
+
         writer.println("Ejemplo:download https://visuales.uclv.cu/Cursos/Jenkins/1%20-%20Introduction/");
+        writer.println("La url proporcionada debe ser el contenedor donde se encuentrar los videos y subtitulos");
         writer.println("ejecute el comando 'help' para ver la lista de comandos disponibles.");
+        writer.println(AnsiColors.RESET);
         writer.flush();
     }
 }
